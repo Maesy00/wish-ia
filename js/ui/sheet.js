@@ -6,12 +6,15 @@
 
 const Sheet = (() => {
   // Ouvre une fenêtre. html = contenu déjà échappé. Renvoie { el, body, close, closed }.
-  function open({ title, html, full = false }) {
+  // full = plein écran sur mobile (fiche, formulaire).
+  // Sans titre visible, « label » nomme la fenêtre pour les lecteurs d'écran.
+  function open({ title = "", label = "", html, full = false }) {
     const dialog = document.createElement("dialog");
     dialog.className = `sheet${full ? " sheet-full" : ""}`;
+    if (!title && label) dialog.setAttribute("aria-label", label);
     dialog.innerHTML = `
       <div class="sheet-head">
-        <h2 class="sheet-title">${escapeHtml(title)}</h2>
+        ${title ? `<h2 class="sheet-title">${escapeHtml(title)}</h2>` : "<span></span>"}
         <button type="button" class="link-btn" data-sheet-close>Fermer</button>
       </div>
       <div class="sheet-body">${html}</div>`;

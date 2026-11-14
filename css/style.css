@@ -562,6 +562,9 @@ select.input {
     display: block;
     position: sticky;
     top: var(--s-5);
+    /* Une fiche plus haute que l'écran défile dans son panneau. */
+    max-height: calc(100dvh - 2 * var(--s-5));
+    overflow-y: auto;
     padding-top: var(--s-3);
   }
 }
@@ -729,4 +732,182 @@ select.input {
 .choice-select {
   display: block;
   margin: 0 0 var(--s-3) 32px;
+}
+
+/* ---------------------------------------------------------------------------
+   Fiche objet
+   --------------------------------------------------------------------------- */
+
+/* Sur mobile, la fiche et le formulaire occupent tout l'écran. */
+@media (max-width: 719px) {
+  .sheet-full {
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+  }
+
+  .sheet-full .sheet-head {
+    padding-top: calc(var(--s-2) + env(safe-area-inset-top));
+    padding-bottom: var(--s-2);
+  }
+}
+
+.fiche-photo {
+  margin-bottom: var(--s-5);
+  background: var(--placeholder);
+}
+
+.fiche-photo img {
+  display: block;
+  width: 100%;
+  max-height: 70dvh;
+  object-fit: contain;
+}
+
+.fiche-photo.is-empty {
+  aspect-ratio: 4 / 5;
+  max-height: 50dvh;
+  width: 100%;
+}
+
+.fiche-name {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--fs-title);
+  font-weight: 400;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.fiche-price {
+  margin: var(--s-3) 0 0;
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fiche-facts {
+  margin: var(--s-5) 0;
+  border-top: 1px solid var(--rule);
+}
+
+.fiche-facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--fs-small);
+}
+
+.fiche-facts dt {
+  color: var(--text-2);
+}
+
+.fiche-facts dd {
+  margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.fiche-note {
+  margin: 0 0 var(--s-5);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1.35;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+a.btn {
+  text-decoration: none;
+}
+
+.fiche-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-5);
+  margin-top: var(--s-3);
+}
+
+@media (min-width: 1100px) {
+  .detail .fiche-name {
+    font-size: 32px;
+  }
+
+  .detail .fiche-photo img {
+    max-height: 46dvh;
+  }
+
+  .detail .fiche-photo.is-empty {
+    max-height: 36dvh;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Formulaire d'un objet
+   --------------------------------------------------------------------------- */
+
+textarea.input {
+  resize: vertical;
+  line-height: 1.5;
+  border: 1px solid var(--text);
+  padding: var(--s-3);
+}
+
+.field-hint {
+  display: block;
+  min-height: 18px;
+  margin-top: var(--s-2);
+  font-size: var(--fs-caption);
+  color: var(--text-2);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-5);
+}
+
+.fetch-status {
+  margin: calc(-1 * var(--s-3)) 0 var(--s-5);
+  font-size: var(--fs-small);
+  color: var(--text-2);
+}
+
+.photo-field {
+  display: flex;
+  align-items: center;
+  gap: var(--s-5);
+}
+
+.photo-preview {
+  flex: none;
+  width: 96px;
+  height: 96px;
+  background: var(--placeholder);
+  overflow: hidden;
+}
+
+.photo-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.photo-pick {
+  display: inline-flex;
+  align-items: center;
+}
+
+.photo-pick:focus-within {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
 }

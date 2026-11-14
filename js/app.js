@@ -9,6 +9,7 @@ const App = (() => {
 
   function render() {
     Inventory.render();
+    Item.render();
     account.textContent = Storage.userEmail();
   }
 
@@ -16,21 +17,13 @@ const App = (() => {
     render();
   }
 
-  // Ouvre la fiche d'un objet (la fiche elle-même arrive à l'étape 5).
   function openItem(id) {
-    Inventory.select(id);
+    Item.open(id);
   }
 
   document.getElementById("manage-lists-btn").addEventListener("click", () => Lists.open());
   document.getElementById("sign-out-btn").addEventListener("click", () => supabaseClient.auth.signOut());
-  document.getElementById("add-item-btn").addEventListener("click", () => {
-    if (!Storage.lists().length) {
-      showToast("Crée d'abord une liste.");
-      Lists.open();
-      return;
-    }
-    showToast("Le formulaire d'ajout arrive à l'étape 5.");
-  });
+  document.getElementById("add-item-btn").addEventListener("click", () => ItemForm.open());
 
   // Revenir sur l'app après plus d'une minute : on recharge les données
   // (elles ont pu changer depuis un autre appareil).
