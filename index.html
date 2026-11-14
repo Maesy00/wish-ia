@@ -13,15 +13,44 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Page provisoire : la connexion arrive à l'étape 3, l'inventaire à l'étape 4. -->
-  <main class="page">
-    <p class="kicker">Inventaire · 0 objet</p>
-    <h1 class="display">Mes <em>envies</em></h1>
-    <hr class="rule">
-    <p class="muted">Wish.ia est en cours de construction.</p>
-  </main>
+  <div id="auth-gate" hidden>
+    <main class="auth-card">
+      <p class="kicker">Wish.ia</p>
+      <h1 class="display">Mes <em>envies</em></h1>
+      <p class="auth-subtitle">Connecte-toi avec le même compte que Coach.ia et Brain.ia.</p>
+      <form id="auth-form">
+        <label class="field">
+          <span class="field-label">Email</span>
+          <input class="input" type="email" id="auth-email" required autocomplete="email">
+        </label>
+        <label class="field">
+          <span class="field-label">Mot de passe</span>
+          <input class="input" type="password" id="auth-password" required autocomplete="current-password" minlength="6">
+        </label>
+        <p id="auth-error" class="form-error" role="alert" hidden></p>
+        <button type="submit" class="btn btn-primary btn-block" id="auth-submit-btn">Se connecter</button>
+      </form>
+    </main>
+  </div>
+
+  <div id="app-shell" hidden>
+    <!-- Page provisoire : l'inventaire arrive à l'étape 4. -->
+    <main class="page">
+      <p class="kicker" id="inventory-kicker">Inventaire</p>
+      <h1 class="display">Mes <em>envies</em></h1>
+      <hr class="rule">
+      <p class="muted">Connecté : <span id="account-email"></span></p>
+      <button type="button" class="link-btn" id="sign-out-btn">Se déconnecter</button>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/ui/core.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
 </body>
 </html>
