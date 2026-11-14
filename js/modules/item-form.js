@@ -1,7 +1,9 @@
 /*
  * item-form.js — formulaire d'ajout et de modification d'un objet.
- * Le lien du produit vient en premier ; le nom de domaine en est extrait
- * automatiquement. La photo est réduite avant l'envoi.
+ * Le lien du produit vient en premier : dès qu'il est collé, la fonction
+ * Supabase « wishia-fetch-product » va chercher la photo, le nom et le prix,
+ * et le formulaire se pré-remplit. Tout reste modifiable avant d'enregistrer.
+ * Le nom de domaine est extrait du lien ; la photo est réduite avant l'envoi.
  */
 
 const ItemForm = (() => {
@@ -12,6 +14,23 @@ const ItemForm = (() => {
   let photoRemoved = false;
   let previewUrl = "";
   let photoSourceUrl = null;
+
+  // Pré-remplissage par lien : ce qui a été rempli automatiquement peut être
+  // remplacé par une nouvelle récupération ; ce que l'utilisateur a saisi, jamais.
+  const FETCH_FUNCTION = "wishia-fetch-product";
+  let lastFetchedUrl = "";
+  let fetchToken = 0;
+  let auto = { name: null, price: null, photo: false };
+
+  const FETCH_MESSAGES = {
+    blocked: "Ce site ne laisse pas lire ses pages.",
+    timeout: "Le site met trop de temps à répondre.",
+    empty: "Aucune information trouvée sur cette page.",
+    not_html: "Ce lien ne mène pas à une page produit.",
+    invalid_url: "Ce lien n'est pas utilisable.",
+    unavailable: "La récupération automatique est indisponible pour le moment.",
+  };
+  const FETCH_FALLBACK = " Remplis la fiche à la main : tu peux ajouter une photo depuis ton téléphone ou coller l'adresse d'une image.";
 
   // « www.exemple.fr » → « exemple.fr »
   function siteOf(url) {
@@ -27,6 +46,12 @@ const ItemForm = (() => {
     if (!cleaned) return null;
     if (!/^\d+(\.\d{1,2})?$/.test(cleaned)) return NaN;
     return Number(cleaned);
+  }
+
+  // 129 → « 129 », 129.9 → « 129,90 »
+  function priceToInput(price) {
+    if (price === null || price === undefined) return "";
+    return Number.isInteger(price) ? String(price) : price.toFixed(2).replace(".", ",");
   }
 
   function formHtml(item, lists, listId) {
@@ -52,7 +77,7 @@ const ItemForm = (() => {
           <label class="field">
             <span class="field-label">Prix (€)</span>
             <input class="input" name="price" inputmode="decimal" autocomplete="off" placeholder="Facultatif"
-              value="${item && item.price !== null ? escapeHtml(String(item.price).replace(".", ",")) : ""}">
+              value="${item ? escapeHtml(priceToInput(item.price)) : ""}">
           </label>
           <label class="field">
             <span class="field-label">Liste</span>
@@ -72,6 +97,15 @@ const ItemForm = (() => {
               <button type="button" class="link-btn" data-photo-remove hidden>Retirer la photo</button>
             </div>
           </div>
+          <div class="photo-url">
+            <label class="photo-url-input">
+              <span class="visually-hidden">Adresse d'une image</span>
+              <input class="input" name="imageUrl" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false"
+                placeholder="ou colle l'adresse d'une image">
+            </label>
+            <button type="button" class="link-btn" data-photo-url-btn>Utiliser</button>
+          </div>
+          <p class="fetch-status" data-photo-status role="status" hidden></p>
         </div>
 
         <label class="field">
@@ -117,12 +151,119 @@ const ItemForm = (() => {
     }
   }
 
+  // ---- Récupération automatique ----
+
+  function setStatus(selector, message, loading = false) {
+    const el = form.querySelector(selector);
+    el.textContent = message;
+    el.hidden = !message;
+    el.classList.toggle("is-loading", loading);
+  }
+
+  async function callFetchFunction(body) {
+    try {
+      const { data, error } = await supabaseClient.functions.invoke(FETCH_FUNCTION, { body });
+      if (error || !data) return { ok: false, reason: "unavailable" };
+      return data;
+    } catch (e) {
+      return { ok: false, reason: "unavailable" };
+    }
+  }
+
+  async function imageToBlob(image) {
+    const res = await fetch(`data:${image.contentType};base64,${image.base64}`);
+    return res.blob();
+  }
+
+  // Une photo récupérée ne remplace pas une photo choisie par l'utilisateur.
+  function hasPhoto() {
+    return Boolean(photoBlob) || Boolean(editing && editing.imagePath && !photoRemoved);
+  }
+
+  function canAutoFillPhoto() {
+    return auto.photo || !hasPhoto();
+  }
+
+  async function fetchFromLink() {
+    const url = safeUrl(form.elements.url.value.trim());
+    if (!url || url === lastFetchedUrl) return;
+    lastFetchedUrl = url;
+    const token = ++fetchToken;
+    const forForm = form;
+    setStatus("[data-fetch-status]", "Récupération des informations", true);
+
+    const data = await callFetchFunction({ url });
+    // Le formulaire a été fermé ou un autre lien a été collé entre-temps.
+    if (form !== forForm || token !== fetchToken) return;
+    if (!data.ok) {
+      setStatus("[data-fetch-status]", (FETCH_MESSAGES[data.reason] || "Cette page n'a pas pu être lue.") + FETCH_FALLBACK);
+      return;
+    }
+
+    const nameInput = form.elements.name;
+    const priceInput = form.elements.price;
+    let gotName = false;
+    let gotPrice = false;
+    let gotPhoto = false;
+
+    if (data.name && (!nameInput.value.trim() || nameInput.value === auto.name)) {
+      nameInput.value = data.name;
+      auto.name = data.name;
+      gotName = true;
+    }
+    if (typeof data.price === "number" && (!priceInput.value.trim() || priceInput.value === auto.price)) {
+      priceInput.value = priceToInput(data.price);
+      auto.price = priceInput.value;
+      gotPrice = true;
+    }
+    if (data.image && canAutoFillPhoto()) {
+      gotPhoto = await setPhoto(await imageToBlob(data.image), data.imageUrl || null);
+      if (form !== forForm) return;
+      auto.photo = gotPhoto;
+    }
+
+    const missing = [];
+    if (!gotName && !nameInput.value.trim()) missing.push("le nom");
+    if (!gotPrice && !priceInput.value.trim()) missing.push("le prix");
+    if (!gotPhoto && !hasPhoto()) missing.push("la photo");
+    let message = missing.length
+      ? `Fiche pré-remplie en partie : ${missing.join(", ")} ${missing.length > 1 ? "restent" : "reste"} à compléter.`
+      : "Fiche pré-remplie : vérifie les informations avant d'enregistrer.";
+    if (gotPrice && data.currency && data.currency !== "EUR") message += ` Le prix trouvé est en ${data.currency} : corrige-le en euros.`;
+    setStatus("[data-fetch-status]", message);
+  }
+
+  // Photo à partir d'une adresse d'image collée.
+  async function usePhotoUrl() {
+    const input = form.elements.imageUrl;
+    const imageUrl = safeUrl(input.value.trim());
+    if (!imageUrl) {
+      setStatus("[data-photo-status]", "Colle une adresse commençant par http:// ou https://.");
+      return;
+    }
+    const forForm = form;
+    setStatus("[data-photo-status]", "Récupération de l'image", true);
+    const data = await callFetchFunction({ imageUrl });
+    if (form !== forForm) return;
+    const ok = data.ok && data.image ? await setPhoto(await imageToBlob(data.image), imageUrl) : false;
+    if (form !== forForm) return;
+    if (ok) {
+      auto.photo = false;
+      input.value = "";
+      setStatus("[data-photo-status]", "");
+    } else {
+      const reason = data.reason === "unavailable" ? FETCH_MESSAGES.unavailable : "Cette image n'a pas pu être récupérée.";
+      setStatus("[data-photo-status]", `${reason} Tu peux choisir une photo depuis ton appareil.`);
+    }
+  }
+
   function clearPhoto() {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     previewUrl = "";
     photoBlob = null;
     photoSourceUrl = null;
     photoRemoved = true;
+    auto.photo = false;
     form.elements.photo.value = "";
     renderPhoto();
   }
@@ -209,6 +350,10 @@ const ItemForm = (() => {
     photoRemoved = false;
     previewUrl = "";
     photoSourceUrl = null;
+    // En modification, le lien déjà enregistré n'est pas récupéré de nouveau.
+    lastFetchedUrl = editing ? safeUrl(editing.url || "") : "";
+    fetchToken += 1;
+    auto = { name: null, price: null, photo: false };
 
     const tab = Inventory.currentTab();
     const listId = editing ? editing.listId : tab !== "all" ? tab : lists[0].id;
@@ -228,11 +373,21 @@ const ItemForm = (() => {
     if (editing && editing.imagePath) Images.ensure([editing.imagePath]).then(() => form && renderPhoto());
 
     form.elements.url.addEventListener("input", renderSite);
+    // Dès qu'un lien est collé (ou saisi puis validé), la fiche se pré-remplit.
+    form.elements.url.addEventListener("paste", () => setTimeout(() => form && fetchFromLink(), 0));
+    form.elements.url.addEventListener("change", fetchFromLink);
+    form.querySelector("[data-photo-url-btn]").addEventListener("click", usePhotoUrl);
+    form.elements.imageUrl.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      usePhotoUrl();
+    });
     form.elements.photo.addEventListener("change", async () => {
       const file = form.elements.photo.files[0];
       if (!file) return;
       const ok = await setPhoto(file);
-      if (!ok) showToast("Cette image n'a pas pu être lue.");
+      if (ok) auto.photo = false;
+      else showToast("Cette image n'a pas pu être lue.");
     });
     form.querySelector("[data-photo-remove]").addEventListener("click", clearPhoto);
     form.querySelector("[data-cancel]").addEventListener("click", () => sheet.close());

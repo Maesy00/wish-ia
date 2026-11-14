@@ -911,3 +911,48 @@ textarea.input {
   outline: 2px solid var(--text);
   outline-offset: 3px;
 }
+
+/* Message de récupération automatique, avec trois points animés pendant l'attente. */
+.fetch-status.is-loading::after {
+  content: "…";
+  display: inline-block;
+  width: 1.2em;
+  overflow: hidden;
+  vertical-align: bottom;
+  animation: fetch-dots 1.2s steps(4, end) infinite;
+}
+
+@keyframes fetch-dots {
+  from {
+    width: 0;
+  }
+  to {
+    width: 1.2em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fetch-status.is-loading::after {
+    animation: none;
+  }
+}
+
+.photo-url {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s-4);
+  margin-top: var(--s-3);
+}
+
+.photo-url-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.photo-url .input {
+  border-bottom-color: var(--rule);
+}
+
+.photo-field + .photo-url + .fetch-status {
+  margin: var(--s-3) 0 0;
+}

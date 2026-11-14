@@ -34,7 +34,36 @@ Les scripts SQL sont dans `supabase/migrations/`, à exécuter dans l'ordre dans
 
 ## Edge Function
 
-`supabase/functions/wishia-fetch-product/` récupère la photo, le nom et le prix d'un produit à partir de son lien. Les instructions de déploiement seront ajoutées avec la fonction.
+`supabase/functions/wishia-fetch-product/` reçoit le lien d'un produit, télécharge la page et renvoie la photo, le nom et le prix (Open Graph, puis JSON-LD, puis Twitter, puis `<title>`). L'app s'en sert pour pré-remplir la fiche.
+
+Elle n'a besoin d'aucun secret : `SUPABASE_URL` et `SUPABASE_ANON_KEY` sont fournis automatiquement par Supabase, et la clé `service_role` n'est pas utilisée.
+
+### Déployer depuis le tableau de bord (comme `coach-calendar`)
+
+1. Projet « Divers.ia » → Edge Functions → Deploy a new function → Via Editor.
+2. Nom de la fonction : `wishia-fetch-product`.
+3. Coller le contenu de `supabase/functions/wishia-fetch-product/index.ts`, puis Deploy.
+4. Dans les réglages de la fonction, laisser « Verify JWT » **activé**.
+
+Pour mettre à jour la fonction : même éditeur, coller la nouvelle version, Deploy.
+
+### Ou avec la CLI Supabase
+
+```bash
+supabase functions deploy wishia-fetch-product --project-ref eqydrejfdpusuvydcjdp
+```
+
+### Réserver la fonction à un seul compte (facultatif)
+
+La fonction refuse déjà tout appel sans session. Pour la limiter à un compte précis, ajouter le secret `WISHIA_ALLOWED_USER_ID` (Edge Functions → Secrets) avec l'identifiant du compte, visible dans Authentication → Users.
+
+### Vérifier
+
+Sans session, la fonction doit répondre 401 :
+
+```bash
+curl -i -X POST https://eqydrejfdpusuvydcjdp.supabase.co/functions/v1/wishia-fetch-product -H "Content-Type: application/json" -d '{"url":"https://www.apple.com/fr/"}'
+```
 
 ## Sauvegardes et anti-veille
 
