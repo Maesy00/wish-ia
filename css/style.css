@@ -163,6 +163,7 @@ body {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -217,4 +218,515 @@ body {
 .toast.visible {
   opacity: 1;
   transform: translate(-50%, 0);
+}
+
+.input::placeholder {
+  color: var(--text-2);
+  opacity: 1;
+}
+
+select.input {
+  padding-right: var(--s-5);
+  background-image: linear-gradient(45deg, transparent 50%, var(--text) 50%), linear-gradient(135deg, var(--text) 50%, transparent 50%);
+  background-position: calc(100% - 9px) 55%, calc(100% - 4px) 55%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+/* Bouton carré réduit à un symbole (flèches de la gestion des listes) */
+.icon-btn {
+  width: var(--tap);
+  height: var(--tap);
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.icon-btn:disabled {
+  color: var(--rule);
+  cursor: default;
+}
+
+.icon-btn:focus-visible,
+.tab:focus-visible,
+.row-name:focus-visible,
+.row-link:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   Inventaire — en-tête, onglets, barre d'outils
+   --------------------------------------------------------------------------- */
+
+.masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s-4);
+  margin-bottom: var(--s-6);
+}
+
+.add-btn {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  font-family: var(--font-serif);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.add-btn span {
+  transform: translateY(-2px);
+}
+
+/* Onglets texte : l'actif est souligné, la rangée défile sur mobile. */
+.tabs {
+  display: flex;
+  gap: var(--s-5);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--rule);
+  scrollbar-width: none;
+  margin: 0 calc(-1 * var(--gutter));
+  padding: 0 var(--gutter);
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex: none;
+  min-height: var(--tap);
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  margin-bottom: -1px;
+  background: none;
+  color: var(--text-2);
+  font: inherit;
+  font-size: var(--fs-small);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tab[aria-selected="true"] {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+.tab-count {
+  margin-left: 6px;
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: var(--s-2) var(--s-5);
+  margin: var(--s-4) 0 var(--s-2);
+}
+
+.toolbar-search {
+  grid-column: 1 / -1;
+}
+
+.toolbar-search .input,
+.toolbar-sort .input {
+  border-bottom-color: var(--rule);
+}
+
+.toolbar-sort {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.toolbar-sort .input {
+  width: auto;
+  min-width: 0;
+  font-size: 16px;
+}
+
+.toolbar-label {
+  font-size: var(--fs-small);
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------------
+   Inventaire — lignes d'objets (mobile)
+   --------------------------------------------------------------------------- */
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.row-head {
+  display: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-4) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.row-photo {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--placeholder);
+  overflow: hidden;
+}
+
+.row-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.row-name {
+  display: block;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: var(--fs-item);
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.row-meta {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--text-2);
+}
+
+.row-col {
+  display: none;
+}
+
+.row-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.row-price {
+  font-size: var(--fs-body);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.row-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  color: var(--text);
+  font-size: var(--fs-small);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  white-space: nowrap;
+}
+
+.row-link.is-empty {
+  min-height: 0;
+}
+
+.empty {
+  padding: var(--s-7) 0;
+  color: var(--text-2);
+}
+
+.empty p {
+  margin: 0 0 var(--s-5);
+}
+
+.detail {
+  display: none;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2) var(--s-5);
+  margin-top: var(--s-7);
+  font-size: var(--fs-small);
+  color: var(--text-2);
+}
+
+/* ---------------------------------------------------------------------------
+   Inventaire — ordinateur : tableau à gauche, fiche à droite
+   --------------------------------------------------------------------------- */
+
+@media (min-width: 720px) {
+  .toolbar {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .toolbar-search {
+    grid-column: auto;
+  }
+}
+
+@media (min-width: 1100px) {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: var(--s-7);
+    align-items: start;
+  }
+
+  .row,
+  .row-head {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) 100px 104px 88px 56px;
+    gap: var(--s-4);
+    align-items: center;
+  }
+
+  .row-head {
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--text);
+    font-size: var(--fs-caption);
+    font-weight: 500;
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+    color: var(--text-2);
+  }
+
+  .row-head.is-empty {
+    display: none;
+  }
+
+  .is-right {
+    text-align: right;
+  }
+
+  .row {
+    padding: var(--s-3) 0;
+  }
+
+  .row.is-selected {
+    background: linear-gradient(var(--selected), var(--selected)) no-repeat 72px 0 / calc(100% - 72px) 100%;
+  }
+
+  .row-meta {
+    display: none;
+  }
+
+  .row-col {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--text-2);
+    overflow-wrap: anywhere;
+  }
+
+  /* Le prix et le lien deviennent deux colonnes distinctes. */
+  .row-side {
+    display: contents;
+  }
+
+  .row-price {
+    text-align: right;
+    font-size: var(--fs-small);
+  }
+
+  .row-link {
+    justify-self: end;
+  }
+
+  .detail {
+    display: block;
+    position: sticky;
+    top: var(--s-5);
+    padding-top: var(--s-3);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Fenêtres (<dialog>)
+   --------------------------------------------------------------------------- */
+
+.sheet {
+  width: 100%;
+  max-width: 100%;
+  max-height: 92dvh;
+  margin: auto 0 0;
+  padding: 0;
+  border: 0;
+  background: var(--bg);
+  color: var(--text);
+  overflow-y: auto;
+}
+
+.sheet::backdrop {
+  background: var(--overlay);
+}
+
+.sheet-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-4) var(--gutter);
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg);
+}
+
+.sheet-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.sheet-body {
+  padding: var(--s-5) var(--gutter) calc(var(--s-6) + env(safe-area-inset-bottom));
+}
+
+.sheet-text {
+  margin: 0 0 var(--s-5);
+}
+
+.sheet-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--s-3);
+  margin-top: var(--s-6);
+}
+
+@media (min-width: 720px) {
+  .sheet {
+    width: 560px;
+    margin: auto;
+    max-height: 86dvh;
+  }
+
+  .sheet-head,
+  .sheet-body {
+    padding-left: var(--s-6);
+    padding-right: var(--s-6);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Gestion des listes
+   --------------------------------------------------------------------------- */
+
+.lm-list {
+  list-style: none;
+  margin: 0 0 var(--s-6);
+  padding: 0;
+}
+
+.lm-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--s-4);
+  padding: var(--s-2) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.lm-order {
+  display: flex;
+  margin-left: -10px;
+}
+
+.lm-grow {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+/* Sur mobile, « Renommer » et « Supprimer » passent sous le nom. */
+.lm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--s-5);
+  flex: 1 0 100%;
+}
+
+@media (min-width: 720px) {
+  .lm-actions {
+    flex: none;
+  }
+}
+
+.lm-name {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: var(--fs-item);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.lm-count {
+  font-size: var(--fs-caption);
+  color: var(--text-2);
+}
+
+.lm-rename,
+.lm-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s-3) var(--s-4);
+  width: 100%;
+}
+
+.lm-rename {
+  padding: var(--s-2) 0;
+}
+
+.choice-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: var(--tap);
+  cursor: pointer;
+}
+
+.choice input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--text);
+}
+
+.choice-select {
+  display: block;
+  margin: 0 0 var(--s-3) 32px;
 }

@@ -140,8 +140,62 @@ const Storage = (() => {
     return true;
   }
 
+  // ---- Opérations propres aux listes ----
+
+  // Nouvel ordre des listes : seules les positions qui changent sont écrites.
+  async function reorderLists(ids) {
+    const changes = ids.map((id, position) => ({ id, position })).filter((c) => (cache.lists.find((l) => l.id === c.id) || {}).position !== c.position);
+    const results = await Promise.all(
+      changes.map((c) => supabaseClient.from(KINDS.lists.table).update({ position: c.position }).eq("id", c.id))
+    );
+    const failed = results.find((r) => r.error);
+    if (failed) {
+      console.error("Erreur de réorganisation :", failed.error.message);
+      await load("lists");
+      return false;
+    }
+    changes.forEach((c) => (cache.lists.find((l) => l.id === c.id).position = c.position));
+    sortCache("lists");
+    return true;
+  }
+
+  // Déplace tous les objets d'une liste vers une autre.
+  async function moveItems(fromListId, toListId) {
+    const { error } = await supabaseClient
+      .from(KINDS.items.table)
+      .update({ list_id: toListId })
+      .eq("list_id", fromListId)
+      .is("archived_at", null);
+    if (error) {
+      console.error("Erreur de déplacement :", error.message);
+      return false;
+    }
+    cache.items.forEach((item) => {
+      if (item.listId === fromListId) item.listId = toListId;
+    });
+    return true;
+  }
+
+  // Archive tous les objets d'une liste (quand on supprime la liste avec son contenu).
+  async function archiveItemsOfList(listId) {
+    const { error } = await supabaseClient
+      .from(KINDS.items.table)
+      .update({ archived_at: new Date().toISOString() })
+      .eq("list_id", listId)
+      .is("archived_at", null);
+    if (error) {
+      console.error("Erreur d'archivage :", error.message);
+      return false;
+    }
+    cache.items = cache.items.filter((item) => item.listId !== listId);
+    return true;
+  }
+
   return {
     refresh,
+    reorderLists,
+    moveItems,
+    archiveItemsOfList,
     insert,
     update,
     archive,

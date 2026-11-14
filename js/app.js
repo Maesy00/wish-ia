@@ -1,17 +1,14 @@
 /*
- * app.js — point d'entrée de l'app une fois connecté.
- * Pour l'instant : l'en-tête de l'inventaire et la déconnexion.
- * Les écrans (inventaire, fiche, formulaire) s'ajoutent aux étapes suivantes.
+ * app.js — point d'entrée de l'app une fois connecté : relie l'inventaire,
+ * la gestion des listes et la fiche d'un objet.
  */
 
 const App = (() => {
-  const kicker = document.getElementById("inventory-kicker");
   const account = document.getElementById("account-email");
-  const signOutBtn = document.getElementById("sign-out-btn");
+  let hiddenAt = null;
 
   function render() {
-    const n = Storage.items().length;
-    kicker.textContent = `Inventaire · ${n} objet${n > 1 ? "s" : ""}`;
+    Inventory.render();
     account.textContent = Storage.userEmail();
   }
 
@@ -19,7 +16,36 @@ const App = (() => {
     render();
   }
 
-  signOutBtn.addEventListener("click", () => supabaseClient.auth.signOut());
+  // Ouvre la fiche d'un objet (la fiche elle-même arrive à l'étape 5).
+  function openItem(id) {
+    Inventory.select(id);
+  }
 
-  return { start, render };
+  document.getElementById("manage-lists-btn").addEventListener("click", () => Lists.open());
+  document.getElementById("sign-out-btn").addEventListener("click", () => supabaseClient.auth.signOut());
+  document.getElementById("add-item-btn").addEventListener("click", () => {
+    if (!Storage.lists().length) {
+      showToast("Crée d'abord une liste.");
+      Lists.open();
+      return;
+    }
+    showToast("Le formulaire d'ajout arrive à l'étape 5.");
+  });
+
+  // Revenir sur l'app après plus d'une minute : on recharge les données
+  // (elles ont pu changer depuis un autre appareil).
+  document.addEventListener("visibilitychange", async () => {
+    if (document.hidden) {
+      hiddenAt = Date.now();
+      return;
+    }
+    if (document.getElementById("app-shell").hidden || hiddenAt === null) return;
+    const away = Date.now() - hiddenAt;
+    hiddenAt = null;
+    if (away < 60 * 1000 || document.querySelector("dialog[open]")) return;
+    await Storage.refresh();
+    render();
+  });
+
+  return { start, render, openItem };
 })();
