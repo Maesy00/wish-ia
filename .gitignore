@@ -1,0 +1,20 @@
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Secrets : rien de secret ne doit entrer dans le dépôt
+.env
+.env.*
+!.env.example
+
+# Dépendances et fichiers générés (l'app n'en a pas, par précaution)
+node_modules/
+build/
+dist/
+
+# Supabase CLI (état local)
+supabase/.temp/
+supabase/.branches/
+
+# Réglages locaux de Claude
+.claude/

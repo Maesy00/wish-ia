@@ -1,0 +1,53 @@
+/*
+ * tokens.css — le design system de Wish.ia en variables.
+ * Style éditorial : fond blanc cassé, texte presque noir, filets fins,
+ * aucune couleur d'accent, aucun coin arrondi.
+ * Titres et noms d'objets en Instrument Serif, tout le reste en Inter.
+ */
+
+:root {
+  /* Couleurs */
+  --bg: #fafaf8;
+  --text: #1a1a1a;
+  --text-2: #555555;
+  --rule: #dddbd5;
+  --placeholder: #eceae4;
+  --primary: #1a1a1a;
+  --on-primary: #fafaf8;
+  --overlay: rgba(26, 26, 26, 0.45);
+  --danger: #8c1c13;
+
+  /* Typographie */
+  --font-serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  --fs-display: 44px;
+  --fs-title: 30px;
+  --fs-item: 21px;
+  --fs-body: 16px;
+  --fs-small: 14px;
+  --fs-caption: 12px;
+  --tracking-caps: 0.14em;
+
+  /* Espacements */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 72px;
+
+  /* Mise en page */
+  --page-max: 1280px;
+  --gutter: 20px;
+  --tap: 44px;
+}
+
+@media (min-width: 900px) {
+  :root {
+    --fs-display: 64px;
+    --fs-title: 40px;
+    --gutter: 40px;
+  }
+}

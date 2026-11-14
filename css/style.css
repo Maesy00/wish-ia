@@ -1,0 +1,74 @@
+/*
+ * style.css — styles de Wish.ia.
+ * Pour l'instant : la base (remise à zéro, typographie, page centrée).
+ * Les écrans s'ajoutent étape par étape.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.page {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: calc(var(--s-7) + env(safe-area-inset-top)) var(--gutter) calc(var(--s-7) + env(safe-area-inset-bottom));
+}
+
+/* Sur-titre en capitales espacées */
+.kicker {
+  margin: 0 0 var(--s-2);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+/* Grand titre en Instrument Serif */
+.display {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--fs-display);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.rule {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: var(--s-5) 0;
+}
+
+.muted {
+  color: var(--text-2);
+}
