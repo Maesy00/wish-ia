@@ -191,8 +191,39 @@ const Storage = (() => {
     return true;
   }
 
+  // ---- Export ----
+
+  // Toutes les lignes d'une table, telles qu'en base (éléments archivés compris).
+  async function fetchRaw(table) {
+    const rows = [];
+    for (let from = 0; ; from += 1000) {
+      const { data, error } = await supabaseClient
+        .from(table)
+        .select("*")
+        .order("created_at", { ascending: true })
+        .order("id", { ascending: true })
+        .range(from, from + 999);
+      if (error) throw new Error(`${table} : ${error.message}`);
+      rows.push(...data);
+      if (data.length < 1000) break;
+    }
+    return rows;
+  }
+
+  // Renvoie { lists, items }, ou null en cas d'échec.
+  async function exportAll() {
+    try {
+      const [lists, items] = await Promise.all([fetchRaw(KINDS.lists.table), fetchRaw(KINDS.items.table)]);
+      return { lists, items };
+    } catch (err) {
+      console.error("Erreur d'export :", err.message);
+      return null;
+    }
+  }
+
   return {
     refresh,
+    exportAll,
     reorderLists,
     moveItems,
     archiveItemsOfList,

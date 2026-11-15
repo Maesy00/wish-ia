@@ -4,6 +4,10 @@ L'inventaire de mes wishlists, organisées par listes (Sport, Maison, Tech, Mode
 
 App web personnelle, installable sur iPhone (PWA) et utilisable sur ordinateur. Interface en français.
 
+## Installer sur iPhone
+
+Ouvrir l'app dans Safari, puis Partager → « Sur l'écran d'accueil ». Elle s'ouvre ensuite en plein écran, sous le nom « Wish.ia ».
+
 ## Technique
 
 Même structure que Coach.ia et Brain.ia :
@@ -69,4 +73,4 @@ curl -i -X POST https://eqydrejfdpusuvydcjdp.supabase.co/functions/v1/wishia-fet
 
 - Sauvegarde nocturne des tables : dépôt `supabase-backups`.
 - Anti-veille du projet Supabase : dépôt `supabase-keepalive`, qui garde déjà « Divers.ia » actif.
-- Dans l'app : bouton « Exporter mes données » (JSON).
+- Dans l'app : le bouton « Exporter mes données », en bas de page, télécharge toutes les listes et tous les objets en JSON (éléments supprimés compris). Les photos ne sont pas dans le fichier : seul leur chemin dans le bucket y figure.

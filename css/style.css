@@ -956,3 +956,9 @@ textarea.input {
 .photo-field + .photo-url + .fetch-status {
   margin: var(--s-3) 0 0;
 }
+
+.footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--s-5);
+}
