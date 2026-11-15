@@ -314,7 +314,7 @@ select.input {
   cursor: pointer;
 }
 
-.tab[aria-selected="true"] {
+.tab[aria-current="true"] {
   color: var(--text);
   border-bottom-color: var(--text);
 }

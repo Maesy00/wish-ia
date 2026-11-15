@@ -66,8 +66,8 @@ const Inventory = (() => {
     tabsEl.innerHTML = entries
       .map(
         (entry) => `
-        <button type="button" class="tab" role="tab" data-tab="${escapeHtml(entry.id)}" aria-selected="${entry.id === tab}">
-          ${escapeHtml(entry.name)}<span class="tab-count">${entry.count}</span>
+        <button type="button" class="tab" data-tab="${escapeHtml(entry.id)}" aria-current="${entry.id === tab}">
+          ${escapeHtml(entry.name)}<span class="tab-count" aria-hidden="true">${entry.count}</span><span class="visually-hidden">, ${plural(entry.count, "objet")}</span>
         </button>`
       )
       .join("");
